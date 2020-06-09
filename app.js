@@ -27,7 +27,7 @@ app.use(cors())
 
 //My routes
 app.use("/api",authRoutes);
-// app.use("/api",userRoutes)
+app.use("/api",userRoutes)
 
 //connection and port
 const port =process.env.PORT || 7777;

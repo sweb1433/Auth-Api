@@ -13,7 +13,7 @@ router.get("/testRoute",isSignedIn , (req,res)=>{
 })
 
 router.get("/getAllUsers",getAllUsers)
-router.post("/getUser",getUser)
+router.get("/getUser",getUser)
 router.post("/signup",[
     [
         // username must be an email
