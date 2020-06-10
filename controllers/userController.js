@@ -1,4 +1,6 @@
 const User = require("../models/users")
+const Order = require("../models/order")
+
 
 exports.getUserById = (req,res,next,id)=>{
         User.findById(id).exec((err,succ)=>{
@@ -31,6 +33,54 @@ exports.updateUser = (req,res) =>{
     )
 }
 
+exports.userPurchaseList = (req,res)=>{
+    Order.find({user:req.profile._id})
+    .populate("user","_id name ")
+    .exec((err,order) =>{
+        if(err){
+            return res.status(400).json({
+                error: "No order in this account"
+            })
+        }
+        return res.json(order)
+    })
+}
+
+exports.pushOrderinPurchaseList= (req,res,next) =>{
+    let purchases = []
+    // data comming from frontend
+    req.body.order.products.forEach(product =>{
+        purchases.push({
+            _id: product._id,
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            quantty: product.quatity,
+            amount: req.body.order.amount,
+            transaction_id:req.body.order.transaction_id
+        })
+    })
+
+    // store in db
+    User.findByIdAndUpdate(
+        // since user is already logged in and profile object is populated(line 12)
+        {_id: req.profile._id},
+        // updation purchases in model/databases with the purchases at line 53
+        {$push: {purchases:purchases}},
+        // new means from the database, send the freshly updated data (only in case of update)
+        {new: true},
+        (err,purchases) =>{
+            if(err){
+                return res.status(400).json({
+                    error: "Unable to save purchases list in db"
+                })
+            }
+            console.log("purchase list updated in db")
+            next()
+        }
+    )
+}
+
 // exports.getUsers = (req,res)=>{
 //     User.find((err,succ)=>{
 //         if(err || !succ){
@@ -43,7 +93,6 @@ exports.updateUser = (req,res) =>{
 // }
 
 exports.getUser = (req,res)=>{
-    // TODO:get here back for password
         req.profile.salt = undefined
         req.profile.encry_password = undefined
         req.profile.createdAt = undefined
