@@ -7,6 +7,8 @@ const cookieParser = require("cookie-parser")
 const authRoutes = require("./routes/authRoutes")
 const userRoutes = require("./routes/usersRoutes")
 const categoryRoutes = require("./routes/categoryRoutes")
+const productRoute = require("./routes/productRoute")
+
 
 const cors = require("cors");
 
@@ -31,6 +33,7 @@ app.use(cors())
 app.use("/api",authRoutes);
 app.use("/api",userRoutes)
 app.use("/api",categoryRoutes)
+app.use("/api",productRoute)
 
 //connection and port
 const port =process.env.PORT || 7777;
